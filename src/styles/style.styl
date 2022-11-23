@@ -1,0 +1,88 @@
+html 
+  scroll-behavior: initial
+
+html, body 
+  position relative
+  width: 100%
+  min-height: 100%
+
+::before, ::after
+  position absolute
+  content ""
+
+.section_title-outline 
+  position: relative
+  -webkit-text-fill-color: transparent
+  -webkit-text-stroke: 2px white !important
+
+
+.section_title-outline::after 
+  /* Place a second copy of the same text over top */
+  content attr(data-text)
+  position absolute
+  left 0
+  -webkit-text-stroke 0
+  pointer-events none
+
+
+.section_title-leaf 
+  position relative
+  -webkit-text-fill-color transparent
+  -webkit-background-clip text
+
+
+
+.contact_bg_mask 
+  -webkit-mask-image url(https://uploads-ssl.webflow.com/636a3cc0e8123382bf004c5d/63734d310109ae243167976d_logo-big.svg)
+  -webkit-mask-repeat no-repeat
+  -webkit-mask-position center
+  -webkit-mask-size 50%
+
+
+.contact_bg_video 
+  width 100vw !important
+  height 100vh !important
+
+.tt
+  display none
+
+// .tt
+//   width 10px
+//   height 10px
+//   position relative
+//   background-color #fff
+// .tt::after
+//   height 100px
+//   width 100px
+//   background-color red
+
+.hero_video2
+  opacity 1 !important
+  z-index 0
+  &::after
+    width 100%
+    height 100%
+    // top 0
+    // right 0
+    // bottom 0
+    // left 0
+    background-color #000
+    z-index 1
+
+/* .word {
+  overflow: hidden;
+  padding-bottom: 0.2em;
+  margin-bottom: -0.2em;
+  transform-origin: bottom;
+} */
+
+// /* .line {
+//   clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+//   padding-bottom: 0.2em;
+//   margin-bottom: -0.2em;
+// } */
+
+.lineParent 
+  overflow hidden
+  padding-bottom 0.2em
+  margin-bottom -0.2em

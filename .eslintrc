@@ -14,6 +14,7 @@
   "extends": ["eslint:recommended", "plugin:prettier/recommended"],
   "plugins": ["import", "sort-imports-es6-autofix"],
   "rules": {
+    "no-unused-vars": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "import/order": [
       "error",
