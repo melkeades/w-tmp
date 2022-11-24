@@ -45,23 +45,30 @@ function onReady() {
 
   const heroVideoAfter = CSSRulePlugin.getRule('.hero_video2:after')
   const tl = gsap.timeline({ defaults: { ease: 'power4.out', duration: 2 } })
-
-  tl.set(heroVideoAfter, { transformOrigin: 'bottom' }).to(heroVideoAfter, {
-    cssRule: { height: '0%' },
-    duration: 2,
-  })
+  // set(heroVideoAfter, { transformOrigin: 'bottom' })
 
   tl.from('.hero_video2', {
     width: '100%',
     // transformOrigin: 'left top',
     onComplete: heroVideoOrigin,
   })
-
-  tl.from([heroTitle.lines, '.hero_copy'], {
-    yPercent: 120,
-    stagger: 0.15,
-    // stagger: { amount: 2 },
-  })
+  tl.to(
+    heroVideoAfter,
+    {
+      cssRule: { height: '0%' },
+    },
+    '>-=1.2'
+  )
+  tl.from(
+    [heroTitle.lines, '.hero_copy'],
+    {
+      yPercent: 120,
+      stagger: 0.15,
+      // stagger: { amount: 2 },
+    },
+    '<'
+  )
+  tl.from(['.hero_logo', '.hero_btn'], { xPercent: 100 })
 }
 
 function heroVideoOrigin() {
