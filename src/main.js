@@ -3,10 +3,10 @@ import Lenis from '@studio-freight/lenis'
 import gsap from 'gsap'
 import CSSRulePlugin from 'gsap/CSSRulePlugin'
 import CustomEase from 'gsap/CustomEase'
+import ScrollTrigger from 'gsap/ScrollTrigger '
 import SplitType from 'split-type'
 
-gsap.registerPlugin(CSSRulePlugin)
-gsap.registerPlugin(CustomEase)
+gsap.registerPlugin(CSSRulePlugin, CustomEase, ScrollTrigger)
 
 const lenis = new Lenis({
   duration: 1.2,
@@ -46,46 +46,66 @@ function onReady() {
   })
 
   const heroVideoAfter = CSSRulePlugin.getRule('.hero_video2:after')
-  const tl = gsap.timeline({ defaults: { ease: 'power4.out', duration: 2 } })
+  const tlLoad = gsap.timeline({
+    defaults: { ease: 'power4.out', duration: 2 },
+  })
+  const tlScrollHero = gsap.timeline({})
+  tlScrollHero.pause()
   // set(heroVideoAfter, { transformOrigin: 'bottom' })
 
-  tl.from('.hero_video2', {
-    ease: CustomEase.create(
-      'custom',
-      'M0,0 C0.29,0 0.219,0.018 0.29,0.103 0.359,0.186 0.413,0.798 0.476,0.892 0.551,1.003 0.704,1 1,1 '
-    ),
-    duration: 2.5,
-    width: '100%',
-    // transformOrigin: 'left top',
-    onComplete: heroVideoOrigin,
+  tlLoad
+    .from('.hero_video2', {
+      ease: CustomEase.create(
+        'custom',
+        'M0,0 C0.29,0 0.219,0.018 0.29,0.103 0.359,0.186 0.413,0.798 0.476,0.892 0.551,1.003 0.704,1 1,1'
+      ),
+      duration: 2.5,
+      width: '100%',
+      // transformOrigin: 'left top',
+      onComplete: heroVideoOrigin,
+    })
+    .to(
+      heroVideoAfter,
+      {
+        // cssRule: { height: '0%' },
+      },
+      '>-1.2'
+    )
+    .from(
+      [heroTitle.lines, '.hero_copy'],
+      {
+        yPercent: 120,
+        stagger: 0.25,
+        // stagger: { amount: 2 },
+      },
+      '<'
+    )
+    .from(
+      ['.hero_logo', '.hero_btn'],
+      { x: 50, opacity: 0, duration: 3 },
+      '>-1.8'
+    )
+    .from(
+      ['.hero_menu', '.hero_awards'],
+      { x: -50, opacity: 0, duration: 3 },
+      '<'
+    )
+    .from('.hero_hr', { scaleX: 0.8, opacity: 0, duration: 3 }, '<')
+    .add(tlScrollHero.tweenFromTo(0, tlScrollHero.duration()), '<1.5')
+    .add(() => {
+      ScrollTrigger.create({
+        animation: tlScrollHero,
+        trigger: '.hero_video2',
+        start: '30% 40%',
+        end: '50% 20%',
+        toggleActions: 'play reverse restart reverse',
+        markers: true,
+      })
+    })
+
+  tlScrollHero.to('.hero_video2', {
+    // clipPath: 'polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%',
   })
-  tl.to(
-    heroVideoAfter,
-    {
-      cssRule: { height: '0%' },
-    },
-    '>-1.2'
-  )
-  tl.from(
-    [heroTitle.lines, '.hero_copy'],
-    {
-      yPercent: 120,
-      stagger: 0.25,
-      // stagger: { amount: 2 },
-    },
-    '<'
-  )
-  tl.from(
-    ['.hero_logo', '.hero_btn'],
-    { x: 50, opacity: 0, duration: 3 },
-    '>-1.6'
-  )
-  tl.from(
-    ['.hero_menu', '.hero_awards'],
-    { x: -50, opacity: 0, duration: 3 },
-    '<'
-  )
-  tl.from('.hero_hr', { scaleX: 0.8, opacity: 0, duration: 3 }, '<')
 }
 
 function heroVideoOrigin() {
@@ -97,9 +117,9 @@ function smoothOriginChange(element, transformOrigin) {
   if (typeof element === 'string') {
     element = document.querySelector(element)
   }
-  var before = element.getBoundingClientRect()
+  let before = element.getBoundingClientRect()
   element.style.transformOrigin = transformOrigin
-  var after = element.getBoundingClientRect()
+  let after = element.getBoundingClientRect()
   gsap.set(element, {
     x: '+=' + (before.left - after.left),
     y: '+=' + (before.top - after.top),

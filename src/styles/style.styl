@@ -38,10 +38,15 @@ html, body
   -webkit-mask-position center
   -webkit-mask-size 50%
 
-
+.hero_navbar
+  padding-top @css{min(8vh, 90px)}
+.hero_info
+  padding-top @css{min(15vh, 390px)}
+.hero_cta
+  padding-top @css{min(9vh, 390px)}
 .contact_bg_video 
-  width 100vw !important
-  height 100vh !important
+  width 100vw
+  height 100vh
 
 .tt
   display none
@@ -59,13 +64,11 @@ html, body
 .hero_video2
   opacity 1 !important
   z-index 0
+  clip-path polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)
   &::after
     width 100%
     height 100%
-    // top 0
-    // right 0
     bottom 0
-    // left 0
     background-color #000
     z-index 1
     // transform-origin bottom !important
