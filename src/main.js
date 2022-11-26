@@ -115,7 +115,7 @@ function onReady() {
     const heroSquish = 100 * slowMultiplier + '%'
     tlScrollHero
       .to('.hero_video2', { ease: 'none', opacity: 0, clipPath: 'polygon(' + heroSquish + ' 0%, 100% 0%, 100% 100%, ' + heroSquish + ' 100%' })
-      .to(['.nero_navbar', '#heroTitle>.lineParent', '.hero_copyW', '.hero_cta'], { y: -600 * slowMultiplier, stagger: { amount: 1 }, duration: 2 }, '<')
+      .to(['.nero_navbar', '#heroTitle>.lineParent', '.hero_copyW', '.hero_cta'], { y: -400 * slowMultiplier, stagger: { amount: 1 }, duration: 2 }, '<')
       .to('.hero_hr', { scaleX: 0, duration: 2.35 }, '<')
       .to(['.hero_btn', '.hero_awards'], { opacity: 0, ease: 'power2.in', duration: 2.4 }, '<')
       // .to('.work_title', { marginTop: '-300px', ease: 'power2.in', duration: 2.4 }, '<')
@@ -125,25 +125,25 @@ function onReady() {
     // })
     return tlScrollHero
   }
-  ScrollTrigger.config({
-    limitCallbacks: true,
-  })
-  ScrollTrigger.create({
-    trigger: '.hero',
-    // end: 'bottom-=30% top+=1',
-    start: 'bottom bottom',
-    // markers: false,
-    onEnterBack: () => {
-      // gsap.set('body', { overflow: 'hidden' })
-      gsap.to(window, {
-        duration: 1.5,
-        scrollTo: { y: '.hero', autoKill: false },
-        overwrite: true,
-        // onComplete: () => gsap.set('body', { overflow: 'auto' }),
-      })
-    },
-  })
-}
+//   ScrollTrigger.config({
+//     limitCallbacks: true,
+//   })
+//   ScrollTrigger.create({
+//     trigger: '.hero',
+//     // end: 'bottom-=30% top+=1',
+//     start: 'bottom bottom',
+//     // markers: false,
+//     onEnterBack: () => {
+//       // gsap.set('body', { overflow: 'hidden' })
+//       gsap.to(window, {
+//         duration: 1.5,
+//         scrollTo: { y: '.hero', autoKill: false },
+//         overwrite: true,
+//         // onComplete: () => gsap.set('body', { overflow: 'auto' }),
+//       })
+//     },
+//   })
+// }
 
 function heroVideoOrigin() {
   smoothOriginChange('.hero_video2', 'right top')
