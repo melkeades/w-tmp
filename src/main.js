@@ -29,6 +29,10 @@ function raf(time) {
 
 requestAnimationFrame(raf)
 
+let lenisScroll = 0
+let slowMultiplier = 1
+let tlLoadComplete = false
+
 function onReady() {
   new SplitType('#heroTitle', {
     types: 'lines',
@@ -43,9 +47,7 @@ function onReady() {
 
   ScrollTrigger.defaults({ markers: true })
   const heroVideoAfter = CSSRulePlugin.getRule('.hero_video2:after')
-  const tlLoad = gsap.timeline({
-    defaults: { ease: 'power4.out', duration: 2 },
-  })
+  const tlLoad = gsap.timeline({ defaults: { ease: 'power4.out', duration: 2 } })
   const tlScrollHero = gsap.timeline({
     defaults: { ease: 'linear', duration: 3 },
     paused: true,
@@ -69,56 +71,75 @@ function onReady() {
     .addLabel('tlLoadEnd')
     // .add(tlScrollHero.tweenFromTo(0, tlScrollHero.duration()), '<1.5')
     .add(() => {
+      tlLoadComplete = true
       addHeroScroll()
     })
 
   //get scroll value
-  let tlLoadScrolled = false
 
   lenis.on('scroll', ({ scroll, limit, velocity, direction, progress }) => {
     // console.log({ scroll, limit, velocity, direction, progress })
-
-    if (scroll >= 10 && !tlLoadScrolled) {
+    lenisScroll = scroll
+    if (scroll >= 10 && !tlLoadComplete && slowMultiplier == 1) {
       // tlLoad.kill()
       // tlLoad.play('qwe', false)
       // tlLoad.tweenTo('tlLoadEnd', { duration: 2 })
-      tlLoadScrolled = true
+      // tlScrollHero.timeScale(0.02)
+      // tlLoadComplete = true
+      slowMultiplier = 0.1
+      console.log('dow')
     }
   })
 
   function addHeroScroll() {
     ScrollTrigger.create({
-      animation: tlScrollHero,
+      animation: heroScrollAni(),
       trigger: '.hero',
       start: 'top top',
       end: 'bottom 30%',
       toggleActions: 'play reverse restart reverse',
       onLeave: () => {
-        console.log('sc')
+        // console.log(slowMultiplier)
+        if (slowMultiplier < 1) {
+          console.log('up')
+          tlScrollHero.seek(0)
+          tlScrollHero.clear()
+          slowMultiplier = 1
+          heroScrollAni()
+        }
       },
       scrub: 1,
     })
   }
-  const heroSquish = '100%'
-  tlScrollHero
-    .to('.hero_video2', { ease: 'none', opacity: 0, clipPath: 'polygon(' + heroSquish + ' 0%, 100% 0%, 100% 100%, ' + heroSquish + ' 100%' })
-    .to(['.nero_navbar', '#heroTitle>.lineParent', '.hero_copyW', '.hero_cta'], { y: -600, stagger: { amount: 1 }, duration: 2 }, '<')
-    .to('.hero_hr', { scaleX: 0, duration: 2.35 }, '<')
-    .to(['.hero_btn', '.hero_awards'], { opacity: 0, ease: 'power2.in', duration: 2.4 }, '<')
-  // .to('.work_title', { marginTop: '-300px', ease: 'power2.in', duration: 2.4 }, '<')
-
+  function heroScrollAni() {
+    const heroSquish = 100 * slowMultiplier + '%'
+    tlScrollHero
+      .to('.hero_video2', { ease: 'none', opacity: 0, clipPath: 'polygon(' + heroSquish + ' 0%, 100% 0%, 100% 100%, ' + heroSquish + ' 100%' })
+      .to(['.nero_navbar', '#heroTitle>.lineParent', '.hero_copyW', '.hero_cta'], { y: -600 * slowMultiplier, stagger: { amount: 1 }, duration: 2 }, '<')
+      .to('.hero_hr', { scaleX: 0, duration: 2.35 }, '<')
+      .to(['.hero_btn', '.hero_awards'], { opacity: 0, ease: 'power2.in', duration: 2.4 }, '<')
+      // .to('.work_title', { marginTop: '-300px', ease: 'power2.in', duration: 2.4 }, '<')
+      .to('.work_title', { y: '-100px', ease: 'power2.in', duration: 2.4 }, '<+=2')
+    // .add(() => {
+    //   tlScrollHero.timeScale(1)
+    // })
+    return tlScrollHero
+  }
+  ScrollTrigger.config({
+    limitCallbacks: true,
+  })
   ScrollTrigger.create({
     trigger: '.hero',
     // end: 'bottom-=30% top+=1',
     start: 'bottom bottom',
     // markers: false,
     onEnterBack: () => {
-      gsap.set('body', { overflow: 'hidden' })
+      // gsap.set('body', { overflow: 'hidden' })
       gsap.to(window, {
         duration: 1.5,
         scrollTo: { y: '.hero', autoKill: false },
-        overwrite: true,
-        onComplete: () => gsap.set('body', { overflow: 'auto' }),
+        // overwrite: true,
+        // onComplete: () => gsap.set('body', { overflow: 'auto' }),
       })
     },
   })
