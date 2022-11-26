@@ -6,9 +6,6 @@ html, body
   width: 100%
   min-height: 100%
 
-::before, ::after
-  position absolute
-  content ""
 
 .section_title-outline 
   position: relative
@@ -39,33 +36,26 @@ html, body
   -webkit-mask-size 50%
 
 .hero_navbar
-  padding-top @css{min(8vh, 90px)}
+  top @css{min(8vh, 110px)}
+
 .hero_info
-  padding-top @css{min(15vh, 390px)}
+  top 45%
+
 .hero_cta
-  padding-top @css{min(9vh, 390px)}
+  bottom @css{min(6vh, 2000px)}
+
 .contact_bg_video 
   width 100vw
   height 100vh
 
-.tt
-  display none
-
-// .tt
-//   width 10px
-//   height 10px
-//   position relative
-//   background-color #fff
-// .tt::after
-//   height 100px
-//   width 100px
-//   background-color red
 
 .hero_video2
-  opacity 1 !important
+  opacity .7
   z-index 0
   clip-path polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)
   &::after
+    position absolute
+    content ''
     width 100%
     height 100%
     bottom 0
@@ -90,3 +80,9 @@ html, body
   overflow hidden
   padding-bottom 0.2em
   margin-bottom -0.2em
+.hero_copyW
+  overflow: hidden
+
+.work_title
+  
+  // background #333

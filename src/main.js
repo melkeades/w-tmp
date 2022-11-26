@@ -3,10 +3,12 @@ import Lenis from '@studio-freight/lenis'
 import gsap from 'gsap'
 import CSSRulePlugin from 'gsap/CSSRulePlugin'
 import CustomEase from 'gsap/CustomEase'
+import ScrollToPlugin from 'gsap/ScrollToPlugin '
 import ScrollTrigger from 'gsap/ScrollTrigger '
+import $ from 'jquery'
 import SplitType from 'split-type'
 
-gsap.registerPlugin(CSSRulePlugin, CustomEase, ScrollTrigger)
+gsap.registerPlugin(CSSRulePlugin, CustomEase, ScrollTrigger, ScrollToPlugin)
 
 const lenis = new Lenis({
   duration: 1.2,
@@ -18,11 +20,6 @@ const lenis = new Lenis({
   smoothTouch: false,
   touchMultiplier: 2,
   infinite: false,
-})
-
-//get scroll value
-lenis.on('scroll', ({ scroll, limit, velocity, direction, progress }) => {
-  console.log({ scroll, limit, velocity, direction, progress })
 })
 
 function raf(time) {
@@ -41,70 +38,89 @@ function onReady() {
 
   const heroTitle = new SplitType('#heroTitle > .lineParent', {
     types: 'lines',
-    lineClass: 'lineChild',
-    // tagName: 'span',
   })
+  const heroCopy = $('#heroCopy').wrap("<div class='hero_copyW'></div>")
 
+  ScrollTrigger.defaults({ markers: true })
   const heroVideoAfter = CSSRulePlugin.getRule('.hero_video2:after')
   const tlLoad = gsap.timeline({
     defaults: { ease: 'power4.out', duration: 2 },
   })
-  const tlScrollHero = gsap.timeline({})
-  tlScrollHero.pause()
+  const tlScrollHero = gsap.timeline({
+    defaults: { ease: 'linear', duration: 3 },
+    paused: true,
+  })
+  // tlScrollHero.pause()
   // set(heroVideoAfter, { transformOrigin: 'bottom' })
 
   tlLoad
     .from('.hero_video2', {
-      ease: CustomEase.create(
-        'custom',
-        'M0,0 C0.29,0 0.219,0.018 0.29,0.103 0.359,0.186 0.413,0.798 0.476,0.892 0.551,1.003 0.704,1 1,1'
-      ),
+      ease: CustomEase.create('custom', 'M0,0 C0.29,0 0.219,0.018 0.29,0.103 0.359,0.186 0.413,0.798 0.476,0.892 0.551,1.003 0.704,1 1,1'),
       duration: 2.5,
       width: '100%',
       // transformOrigin: 'left top',
       onComplete: heroVideoOrigin,
     })
-    .to(
-      heroVideoAfter,
-      {
-        // cssRule: { height: '0%' },
-      },
-      '>-1.2'
-    )
-    .from(
-      [heroTitle.lines, '.hero_copy'],
-      {
-        yPercent: 120,
-        stagger: 0.25,
-        // stagger: { amount: 2 },
-      },
-      '<'
-    )
-    .from(
-      ['.hero_logo', '.hero_btn'],
-      { x: 50, opacity: 0, duration: 3 },
-      '>-1.8'
-    )
-    .from(
-      ['.hero_menu', '.hero_awards'],
-      { x: -50, opacity: 0, duration: 3 },
-      '<'
-    )
+    .to(heroVideoAfter, { cssRule: { height: '100%' } }, '>-=1.2')
+    .from([heroTitle.lines, heroCopy], { yPercent: 120, stagger: 0.25 }, '<')
+    .from(['.hero_logo', '.hero_btn'], { x: 50, opacity: 0, duration: 3 }, '>-=1.8')
+    .from(['.hero_menu', '.hero_awards'], { x: -50, opacity: 0, duration: 3 }, '<')
     .from('.hero_hr', { scaleX: 0.8, opacity: 0, duration: 3 }, '<')
-    .add(tlScrollHero.tweenFromTo(0, tlScrollHero.duration()), '<1.5')
+    .addLabel('tlLoadEnd')
+    // .add(tlScrollHero.tweenFromTo(0, tlScrollHero.duration()), '<1.5')
     .add(() => {
-      ScrollTrigger.create({
-        animation: tlScrollHero,
-        trigger: '.hero_video2',
-        start: '30% 40%',
-        end: '50% 20%',
-        toggleActions: 'play reverse restart reverse',
-        markers: true,
-      })
+      addHeroScroll()
     })
 
-  tlScrollHero.to('.hero_video2', {
-    // clipPath: 'polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%',
+  //get scroll value
+  let tlLoadScrolled = false
+
+  lenis.on('scroll', ({ scroll, limit, velocity, direction, progress }) => {
+    // console.log({ scroll, limit, velocity, direction, progress })
+
+    if (scroll >= 10 && !tlLoadScrolled) {
+      // tlLoad.kill()
+      // tlLoad.play('qwe', false)
+      // tlLoad.tweenTo('tlLoadEnd', { duration: 2 })
+      tlLoadScrolled = true
+    }
+  })
+
+  function addHeroScroll() {
+    ScrollTrigger.create({
+      animation: tlScrollHero,
+      trigger: '.hero',
+      start: 'top top',
+      end: 'bottom 30%',
+      toggleActions: 'play reverse restart reverse',
+      onLeave: () => {
+        console.log('sc')
+      },
+      scrub: 1,
+    })
+  }
+  const heroSquish = '100%'
+  tlScrollHero
+    .to('.hero_video2', { ease: 'none', opacity: 0, clipPath: 'polygon(' + heroSquish + ' 0%, 100% 0%, 100% 100%, ' + heroSquish + ' 100%' })
+    .to(['.nero_navbar', '#heroTitle>.lineParent', '.hero_copyW', '.hero_cta'], { y: -600, stagger: { amount: 1 }, duration: 2 }, '<')
+    .to('.hero_hr', { scaleX: 0, duration: 2.35 }, '<')
+    .to(['.hero_btn', '.hero_awards'], { opacity: 0, ease: 'power2.in', duration: 2.4 }, '<')
+  // .to('.work_title', { marginTop: '-300px', ease: 'power2.in', duration: 2.4 }, '<')
+
+  ScrollTrigger.create({
+    trigger: '.hero',
+    // end: 'bottom-=30% top+=1',
+    start: 'bottom bottom',
+    // markers: false,
+    onEnterBack: () => {
+      gsap.set('body', { overflow: 'hidden' })
+      gsap.to(window, {
+        duration: 1.5,
+        scrollTo: { y: '.hero', autoKill: false },
+        overwrite: true,
+        onComplete: () => gsap.set('body', { overflow: 'auto' }),
+      })
+    },
   })
 }
 
