@@ -138,7 +138,7 @@ function onReady() {
       gsap.to(window, {
         duration: 1.5,
         scrollTo: { y: '.hero', autoKill: false },
-        // overwrite: true,
+        overwrite: true,
         // onComplete: () => gsap.set('body', { overflow: 'auto' }),
       })
     },
