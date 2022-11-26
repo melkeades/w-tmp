@@ -8,8 +8,6 @@ import ScrollTrigger from 'gsap/ScrollTrigger '
 import $ from 'jquery'
 import SplitType from 'split-type'
 
-gsap.registerPlugin(CSSRulePlugin, CustomEase, ScrollTrigger, ScrollToPlugin)
-
 const lenis = new Lenis({
   duration: 1.2,
   easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // https://www.desmos.com/calculator/brs54l4xou
@@ -28,6 +26,8 @@ function raf(time) {
 }
 
 requestAnimationFrame(raf)
+
+gsap.registerPlugin(CSSRulePlugin, CustomEase, ScrollTrigger, ScrollToPlugin)
 
 let lenisScroll = 0
 let slowMultiplier = 1
@@ -77,19 +77,19 @@ function onReady() {
 
   //get scroll value
 
-  lenis.on('scroll', ({ scroll, limit, velocity, direction, progress }) => {
-    // console.log({ scroll, limit, velocity, direction, progress })
-    lenisScroll = scroll
-    if (scroll >= 10 && !tlLoadComplete && slowMultiplier == 1) {
-      // tlLoad.kill()
-      // tlLoad.play('qwe', false)
-      // tlLoad.tweenTo('tlLoadEnd', { duration: 2 })
-      // tlScrollHero.timeScale(0.02)
-      // tlLoadComplete = true
-      slowMultiplier = 0.1
-      console.log('dow')
-    }
-  })
+  // lenis.on('scroll', ({ scroll, limit, velocity, direction, progress }) => {
+  //   // console.log({ scroll, limit, velocity, direction, progress })
+  //   lenisScroll = scroll
+  //   if (scroll >= 10 && !tlLoadComplete && slowMultiplier === 1) {
+  //     // tlLoad.kill()
+  //     // tlLoad.play('qwe', false)
+  //     // tlLoad.tweenTo('tlLoadEnd', { duration: 2 })
+  //     // tlScrollHero.timeScale(0.02)
+  //     // tlLoadComplete = true
+  //     slowMultiplier = 0.1
+  //     console.log('dow')
+  //   }
+  // })
 
   function addHeroScroll() {
     ScrollTrigger.create({
@@ -133,16 +133,26 @@ function onReady() {
     // end: 'bottom-=30% top+=1',
     start: 'bottom bottom',
     // markers: false,
-    onEnterBack: () => {
-      // gsap.set('body', { overflow: 'hidden' })
-      gsap.to(window, {
-        duration: 1.5,
-        scrollTo: { y: '.hero', autoKill: false },
-        overwrite: true,
-        // onComplete: () => gsap.set('body', { overflow: 'auto' }),
-      })
+    onUpdate: (self) => {
+      if (self.direction === -1) {
+        scrollUp()
+      }
     },
+    // onEnterBack: () => {
+    //   // gsap.set('body', { overflow: 'hidden' })
+    //   // gsap.to(window, {
+    //   //   duration: 1.5,
+    //   //   scrollTo: { y: '.hero', autoKill: false },
+    //   //   overwrite: true,
+    //   //   // onComplete: () => gsap.set('body', { overflow: 'auto' }),
+    //   // })
+    //   scrollUp()
+    // },
   })
+}
+
+function scrollUp() {
+  lenis.scrollTo('.hero', { duration: 2 })
 }
 
 function heroVideoOrigin() {
