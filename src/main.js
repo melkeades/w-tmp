@@ -30,7 +30,7 @@ requestAnimationFrame(raf)
 gsap.registerPlugin(CSSRulePlugin, CustomEase, ScrollTrigger, ScrollToPlugin)
 
 let lenisScroll = 0
-let slowMultiplier = 1
+let heroScrollMultiplier = 0.6
 let tlLoadComplete = false
 
 function onReady() {
@@ -52,7 +52,7 @@ function onReady() {
     defaults: { ease: 'linear', duration: 3 },
     paused: true,
   })
-  // tlScrollHero.pause()
+  tlScrollHero.pause()
   // set(heroVideoAfter, { transformOrigin: 'bottom' })
 
   tlLoad
@@ -61,15 +61,15 @@ function onReady() {
       duration: 2.5,
       width: '100%',
       // transformOrigin: 'left top',
-      onComplete: heroVideoOrigin,
+      // onComplete: heroVideoOrigin,
     })
-    .to(heroVideoAfter, { cssRule: { height: '100%' } }, '>-=1.2')
+    .to(heroVideoAfter, { cssRule: { height: '0%' } }, '>-=1.2')
     .from([heroTitle.lines, heroCopy], { yPercent: 120, stagger: 0.25 }, '<')
     .from(['.hero_logo', '.hero_btn'], { x: 50, opacity: 0, duration: 3 }, '>-=1.8')
     .from(['.hero_menu', '.hero_awards'], { x: -50, opacity: 0, duration: 3 }, '<')
     .from('.hero_hr', { scaleX: 0.8, opacity: 0, duration: 3 }, '<')
     .addLabel('tlLoadEnd')
-    // .add(tlScrollHero.tweenFromTo(0, tlScrollHero.duration()), '<1.5')
+    .add(tlScrollHero.tweenFromTo(0, tlScrollHero.duration()), '<1.5')
     .add(() => {
       tlLoadComplete = true
       addHeroScroll()
@@ -77,22 +77,23 @@ function onReady() {
 
   //get scroll value
 
-  // lenis.on('scroll', ({ scroll, limit, velocity, direction, progress }) => {
-  //   // console.log({ scroll, limit, velocity, direction, progress })
-  //   lenisScroll = scroll
-  //   if (scroll >= 10 && !tlLoadComplete && slowMultiplier === 1) {
-  //     // tlLoad.kill()
-  //     // tlLoad.play('qwe', false)
-  //     // tlLoad.tweenTo('tlLoadEnd', { duration: 2 })
-  //     // tlScrollHero.timeScale(0.02)
-  //     // tlLoadComplete = true
-  //     slowMultiplier = 0.1
-  //     console.log('dow')
-  //   }
-  // })
+  lenis.on('scroll', ({ scroll, limit, velocity, direction, progress }) => {
+    // console.log({ scroll, limit, velocity, direction, progress })
+    lenisScroll = scroll
+    if (scroll >= 10 && !tlLoadComplete && heroScrollMultiplier > 0.3) {
+      // tlLoad.kill()
+      // tlLoad.play('qwe', false)
+      // tlLoad.tweenTo('tlLoadEnd', { duration: 2 })
+      // tlScrollHero.timeScale(0.02)
+      // tlLoadComplete = true
+      heroScrollMultiplier = 0.1
+      console.log('dow')
+    }
+  })
 
   function addHeroScroll() {
     ScrollTrigger.create({
+      markers: false,
       animation: heroScrollAni(),
       trigger: '.hero',
       start: 'top top',
@@ -100,11 +101,11 @@ function onReady() {
       toggleActions: 'play reverse restart reverse',
       onLeave: () => {
         // console.log(slowMultiplier)
-        if (slowMultiplier < 1) {
+        if (heroScrollMultiplier < 0.5) {
           console.log('up')
           tlScrollHero.seek(0)
           tlScrollHero.clear()
-          slowMultiplier = 1
+          heroScrollMultiplier = 0.6
           heroScrollAni()
         }
       },
@@ -112,14 +113,14 @@ function onReady() {
     })
   }
   function heroScrollAni() {
-    const heroSquish = 100 * slowMultiplier + '%'
+    const heroSquish = 100 * heroScrollMultiplier + '%'
     tlScrollHero
-      .to('.hero_video2', { ease: 'none', opacity: 0, clipPath: 'polygon(' + heroSquish + ' 0%, 100% 0%, 100% 100%, ' + heroSquish + ' 100%' })
-      .to(['.nero_navbar', '#heroTitle>.lineParent', '.hero_copyW', '.hero_cta'], { y: -600 * slowMultiplier, stagger: { amount: 1 }, duration: 2 }, '<')
+      .to('.hero_video2', { ease: 'none', opacity: 0.1, clipPath: 'polygon(' + heroSquish + ' 0%, 100% 0%, 100% 100%, ' + heroSquish + ' 100%' })
+      .to(['.nero_navbar', '#heroTitle>.lineParent', '.hero_copyW', '.hero_cta'], { y: -600 * heroScrollMultiplier, stagger: { amount: 1 }, duration: 2 }, '<')
       .to('.hero_hr', { scaleX: 0, duration: 2.35 }, '<')
-      .to(['.hero_btn', '.hero_awards'], { opacity: 0, ease: 'power2.in', duration: 2.4 }, '<')
+      .to(['.hero_btn', '.hero_awards'], { opacity: 0, ease: 'power2.in', duration: 2.9 }, '<')
       // .to('.work_title', { marginTop: '-300px', ease: 'power2.in', duration: 2.4 }, '<')
-      .to('.work_title', { y: '-100px', ease: 'power2.in', duration: 2.4 }, '<+=2')
+      .to('.work_title', { y: '-150px', ease: 'power2.in', duration: 2.4 }, '<+=1')
     // .add(() => {
     //   tlScrollHero.timeScale(1)
     // })
@@ -132,22 +133,12 @@ function onReady() {
     trigger: '.hero',
     // end: 'bottom-=30% top+=1',
     start: 'bottom bottom',
-    // markers: false,
+    markers: false,
     onUpdate: (self) => {
       if (self.direction === -1) {
         scrollUp()
       }
     },
-    // onEnterBack: () => {
-    //   // gsap.set('body', { overflow: 'hidden' })
-    //   // gsap.to(window, {
-    //   //   duration: 1.5,
-    //   //   scrollTo: { y: '.hero', autoKill: false },
-    //   //   overwrite: true,
-    //   //   // onComplete: () => gsap.set('body', { overflow: 'auto' }),
-    //   // })
-    //   scrollUp()
-    // },
   })
 }
 
