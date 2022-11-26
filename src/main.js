@@ -102,9 +102,9 @@ function onReady() {
     limitCallbacks: true,
   })
   ScrollTrigger.create({
+    markers: false,
     trigger: '.hero',
     start: 'bottom bottom',
-    markers: false,
     onUpdate: (self) => {
       if (self.direction === -1) {
         scrollUp()
