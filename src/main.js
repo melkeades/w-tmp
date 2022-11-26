@@ -33,6 +33,11 @@ let lenisScroll = 0
 let heroScrollMultiplier = 0.6
 let tlLoadComplete = false
 
+//get scroll value
+lenis.on('scroll', ({ scroll, limit, velocity, direction, progress }) => {
+  // console.log({ scroll, limit, velocity, direction, progress })
+  lenisScroll = scroll
+})
 function onReady() {
   new SplitType('#heroTitle', {
     types: 'lines',
@@ -49,11 +54,12 @@ function onReady() {
   const heroVideoAfter = CSSRulePlugin.getRule('.hero_video2:after')
   const tlLoad = gsap.timeline({ defaults: { ease: 'power4.out', duration: 2 } })
   const tlScrollHero = gsap.timeline({
-    defaults: { ease: 'linear', duration: 3 },
+    defaults: { ease: 'none', duration: 3 },
     paused: true,
   })
   tlScrollHero.pause()
   // set(heroVideoAfter, { transformOrigin: 'bottom' })
+  const tlWorkTitle = gsap.timeline({ defaults: { ease: 'none', duration: 3 } })
 
   tlLoad
     .from('.hero_video2', {
@@ -68,62 +74,28 @@ function onReady() {
     .from(['.hero_logo', '.hero_btn'], { x: 50, opacity: 0, duration: 3 }, '>-=1.8')
     .from(['.hero_menu', '.hero_awards'], { x: -50, opacity: 0, duration: 3 }, '<')
     .from('.hero_hr', { scaleX: 0.8, opacity: 0, duration: 3 }, '<')
-    .addLabel('tlLoadEnd')
-    .add(tlScrollHero.tweenFromTo(0, tlScrollHero.duration()), '<1.5')
+    .add(tlScrollHero.tweenFromTo(0, tlScrollHero.duration()))
     .add(() => {
       tlLoadComplete = true
-      addHeroScroll()
+      ScrollTrigger.create({
+        markers: false,
+        animation: heroScrollAni(),
+        trigger: '.hero',
+        start: 'top top',
+        end: 'bottom 30%',
+        toggleActions: 'play reverse restart reverse',
+        scrub: 1,
+      })
     })
 
-  //get scroll value
-
-  lenis.on('scroll', ({ scroll, limit, velocity, direction, progress }) => {
-    // console.log({ scroll, limit, velocity, direction, progress })
-    lenisScroll = scroll
-    if (scroll >= 10 && !tlLoadComplete && heroScrollMultiplier > 0.3) {
-      // tlLoad.kill()
-      // tlLoad.play('qwe', false)
-      // tlLoad.tweenTo('tlLoadEnd', { duration: 2 })
-      // tlScrollHero.timeScale(0.02)
-      // tlLoadComplete = true
-      heroScrollMultiplier = 0.1
-      console.log('dow')
-    }
-  })
-
-  function addHeroScroll() {
-    ScrollTrigger.create({
-      markers: false,
-      animation: heroScrollAni(),
-      trigger: '.hero',
-      start: 'top top',
-      end: 'bottom 30%',
-      toggleActions: 'play reverse restart reverse',
-      onLeave: () => {
-        // console.log(slowMultiplier)
-        if (heroScrollMultiplier < 0.5) {
-          console.log('up')
-          tlScrollHero.seek(0)
-          tlScrollHero.clear()
-          heroScrollMultiplier = 0.6
-          heroScrollAni()
-        }
-      },
-      scrub: 1,
-    })
-  }
   function heroScrollAni() {
-    const heroSquish = 100 * heroScrollMultiplier + '%'
+    const heroSquish = 100 + '%'
     tlScrollHero
       .to('.hero_video2', { ease: 'none', opacity: 0.1, clipPath: 'polygon(' + heroSquish + ' 0%, 100% 0%, 100% 100%, ' + heroSquish + ' 100%' })
-      .to(['.nero_navbar', '#heroTitle>.lineParent', '.hero_copyW', '.hero_cta'], { y: -600 * heroScrollMultiplier, stagger: { amount: 1 }, duration: 2 }, '<')
+      .to(['.nero_navbar', '#heroTitle>.lineParent', '.hero_copyW', '.hero_cta'], { y: -300 * heroScrollMultiplier, stagger: { amount: 1 }, duration: 2 }, '<')
       .to('.hero_hr', { scaleX: 0, duration: 2.35 }, '<')
-      .to(['.hero_btn', '.hero_awards'], { opacity: 0, ease: 'power2.in', duration: 2.9 }, '<')
-      // .to('.work_title', { marginTop: '-300px', ease: 'power2.in', duration: 2.4 }, '<')
-      .to('.work_title', { y: '-150px', ease: 'power2.in', duration: 2.4 }, '<+=1')
-    // .add(() => {
-    //   tlScrollHero.timeScale(1)
-    // })
+      .to(['.hero_btn', '.hero_awards'], { opacity: 0, ease: 'power2.in', duration: 2.4 }, '<')
+
     return tlScrollHero
   }
   ScrollTrigger.config({
@@ -131,7 +103,6 @@ function onReady() {
   })
   ScrollTrigger.create({
     trigger: '.hero',
-    // end: 'bottom-=30% top+=1',
     start: 'bottom bottom',
     markers: false,
     onUpdate: (self) => {
@@ -140,28 +111,53 @@ function onReady() {
       }
     },
   })
-}
-
-function scrollUp() {
-  lenis.scrollTo('.hero', { duration: 2 })
-}
-
-function heroVideoOrigin() {
-  smoothOriginChange('.hero_video2', 'right top')
-  // gsap.to('.hero_video2', { duration: 3, scale: 1 })
-}
-
-function smoothOriginChange(element, transformOrigin) {
-  if (typeof element === 'string') {
-    element = document.querySelector(element)
-  }
-  let before = element.getBoundingClientRect()
-  element.style.transformOrigin = transformOrigin
-  let after = element.getBoundingClientRect()
-  gsap.set(element, {
-    x: '+=' + (before.left - after.left),
-    y: '+=' + (before.top - after.top),
+  ScrollTrigger.create({
+    // markers: false,
+    trigger: '.contact_fg',
+    start: 'top center',
+    animation: gsap.timeline().to('.contact_bg', { '-webkit-mask-size': '200%' }),
+    toggleActions: 'play reverse restart reverse',
+    scrub: 1,
+    onUpdate: (self) => {
+      if (self.direction === 1) {
+        scrollDown()
+      }
+    },
   })
+
+  tlWorkTitle
+    // .set('.work_title>.section_title-leaf', { backgroundAattachment: 'fixed', paddingTop: '5px' })
+    // .to('.work_title', { yPercent: -30, ease: 'linear' })
+    .from('.work_title>.work_title_leaf', { yPercent: 30 }, '<')
+    .from('.work_title>.work_title_leaf-outline', { yPercent: 50 }, '<')
+    .fromTo('.work_title>.section_title-green', { yPercent: 90 }, { yPercent: -30 }, '<')
+
+  ScrollTrigger.create({
+    markers: false,
+    trigger: '.work_title',
+    start: 'top center+=20%',
+    end: 'bottom top',
+    animation: tlWorkTitle,
+    toggleActions: 'play reverse restart reverse',
+    scrub: 1,
+  })
+
+  function scrollUp() {
+    lenis.scrollTo('.hero', {
+      duration: (2 * lenisScroll) / 300,
+      esing: (x) => {
+        x === 0 ? 0 : Math.pow(2, 10 * x - 10) // https://easings.net/en#easeInOutQuart
+        // inout exp: x < 0.5 ? 8 * x * x * x * x : 1 - Math.pow(-2 * x + 2, 4) / 2
+        // out exp: x === 1 ? 1 : 1 - Math.pow(2, -10 * x)
+        // in exp: x === 0 ? 0 : Math.pow(2, 10 * x - 10)
+      },
+    })
+  }
+  function scrollDown() {
+    lenis.scrollTo('.footer', {
+      duration: 4,
+    })
+  }
 }
 
 if (document.readyState !== 'loading') {
