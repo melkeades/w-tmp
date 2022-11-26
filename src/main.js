@@ -112,7 +112,7 @@ function onReady() {
     },
   })
   ScrollTrigger.create({
-    // markers: false,
+    markers: false,
     trigger: '.contact_fg',
     start: 'top center',
     animation: gsap.timeline().to('.contact_bg', { '-webkit-mask-size': '200%' }),
