@@ -111,6 +111,7 @@ function onReady() {
       }
     },
   })
+
   ScrollTrigger.create({
     markers: false,
     trigger: '.contact_fg',
